@@ -1,0 +1,36 @@
+# Usage:
+#
+# jobs:
+#   build-documentation:
+#     uses: meero-com/github-actions-shared-workflows/.github/workflows/build-documentation.yml@main
+
+on:
+  workflow_call:
+
+jobs:
+  build-documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ammaraskar/sphinx-action@master
+        with:
+          docs-folder: "docs/"
+      - uses: actions/upload-artifact@v3
+        if: github.event_name == 'pull_request'
+        with:
+          name: "HTML Documentation"
+          path: docs/build/html/
+          retention-days: 3
+      - uses: actions/github-script@v5
+        if: github.event_name == 'pull_request' && success()
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const artifactsUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}#artifacts`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `▶︎ Download [compiled HTML Documentation](${artifactsUrl}) for commit https://github.com/${context.repo.owner}/${context.repo.repo}/commit/${context.sha}.`
+            })
