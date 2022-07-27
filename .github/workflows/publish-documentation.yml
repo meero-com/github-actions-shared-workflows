@@ -1,0 +1,32 @@
+# Description:
+#   This workflow commits the changes in the docs/source folder to the engineering-documentation repository.
+#   It should be used only when contents of docs/ folder changes on a merge in the main branch.
+#
+# Usage:
+#
+#   jobs:
+#     publish-documentation:
+#       uses: meero-com/github-actions-shared-workflows/.github/workflows/publish-documentation.yml@main
+
+on:
+  workflow_call: ~
+
+jobs:
+  publish-documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Publish documentation in enginerring
+        id: push_directory
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-directory: 'docs/source'
+          destination-github-username: 'meero-com'
+          destination-repository-name: 'engineering-documentation'
+          commit-message: See ORIGIN_COMMIT from $GITHUB_REF
+          target-branch: master
+          target-directory: docs/source/projects/${{ github.event.repository.name }}/
