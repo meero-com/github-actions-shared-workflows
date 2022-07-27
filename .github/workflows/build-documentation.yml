@@ -1,8 +1,12 @@
+# Description:
+#   This workflow check the build of the documentation and publish the result in a comment on the PR.
+#   It can only be used for pull requests.
+#
 # Usage:
 #
-# jobs:
-#   build-documentation:
-#     uses: meero-com/github-actions-shared-workflows/.github/workflows/build-documentation.yml@main
+#   jobs:
+#     build-documentation:
+#       uses: meero-com/github-actions-shared-workflows/.github/workflows/build-documentation.yml@main
 
 on:
   workflow_call:
