@@ -20,6 +20,7 @@ jobs:
       - uses: ammaraskar/sphinx-action@master
         with:
           docs-folder: "docs/"
+          pre-build-command: "pip install myst-parser sphinx_rtd_theme"
       - uses: actions/upload-artifact@v3
         if: github.event_name == 'pull_request'
         with:
