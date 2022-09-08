@@ -1,0 +1,31 @@
+name: "Get repository specific topic"
+description: "Extract a specific topic based on provided prefix"
+
+inputs:
+  prefix:
+    description: "Prefix to match"
+    required: true
+
+outputs:
+  topic:
+    description: "Topic matched or empty string if not found"
+    value: ${{ steps.extract-topic.outputs.topic }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: extract-topic
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const getTopic = function(gh_repo, prefix) {
+            let name = '';
+            gh_repo.topics.forEach((topic) => {
+              if (topic.startsWith(prefix)) {
+                name = topic;
+              }
+            })
+            return name
+          }
+
+          core.setOutput('topic', getTopic(context.payload.repository, '${{ inputs.prefix }}'))

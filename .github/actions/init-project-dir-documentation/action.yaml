@@ -1,0 +1,37 @@
+name: "Init Project directory documentation"
+description: "Initialize Project directory for documentation subdirectories"
+
+inputs:
+  project-name:
+    description: "Project name"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Init local documentation"
+      run: |
+        mkdir docs_project_temp
+        echo '${{ inputs.project-name }}' >> docs_project_temp/index.rst
+        echo '==============' >> docs_project_temp/index.rst
+        echo '' >> docs_project_temp/index.rst
+        echo '.. toctree::' >> docs_project_temp/index.rst
+        echo '  :glob:' >> docs_project_temp/index.rst
+        echo '  :maxdepth: 2' >> docs_project_temp/index.rst
+        echo '  :caption: Repositories' >> docs_project_temp/index.rst
+        echo '' >> docs_project_temp/index.rst
+        echo '  includes/*/*' >> docs_project_temp/index.rst
+      shell: bash
+    - name: Publish project index in enginerring
+      id: push_project_index
+      uses: cpina/github-action-push-to-another-repository@main
+      with:
+        source-directory: 'docs_project_temp'
+        destination-github-username: 'meero-com'
+        destination-repository-name: 'engineering-documentation'
+        commit-message: Init ${{ inputs.project-name }} dir - See ORIGIN_COMMIT from $GITHUB_REF
+        target-branch: master
+        target-directory: docs/source/projects/${{ inputs.project-name }}/
+    - name: "Remove local documentation"
+      run:  rm -rf docs_project_temp
+      shell: bash
