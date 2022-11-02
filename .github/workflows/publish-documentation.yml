@@ -25,7 +25,7 @@ jobs:
         with:
           prefix: 'project-'
       - id: project-index
-        if: ${{ steps.project-name.outputs.topic }} != ''
+        if: ${{ steps.project-name.outputs.topic != '' }}
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.API_TOKEN_GITHUB }}
