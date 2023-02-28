@@ -29,7 +29,7 @@ runs:
         branch: ${{ inputs.branch }}
         dry_run: false
         extends: |
-          meero-com/github-actions-shared-workflows
+          @meero/github-actions-shared-workflows
         extra_plugins: |
           @semantic-release/commit-analyzer@9.0.2
           @semantic-release/release-notes-generator@10.0.3
@@ -39,3 +39,4 @@ runs:
           @semantic-release/exec@6.0.3
           @semantic-release/npm@9.0.1
           conventional-changelog-conventionalcommits@4.3.0
+          meero-com/github-actions-shared-workflows
