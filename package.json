@@ -1,0 +1,22 @@
+{
+  "name": "meero-com-github-actions-shared-workflows",
+  "version": "1.0.0",
+  "description": "Shared workflows for Meero GitHub Actions runs.",
+  "main": "release.config.js",
+  "files": [
+    "release.config.js"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meero-com/github-actions-shared-workflows.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/meero-com/github-actions-shared-workflows/issues"
+  },
+  "homepage": "https://github.com/meero-com/github-actions-shared-workflows#readme"
+}
