@@ -1,5 +1,5 @@
 {
-  "name": "meero-com-github-actions-shared-workflows",
+  "name": "@meero/github-actions-shared-workflows",
   "version": "1.0.0",
   "description": "Shared workflows for Meero GitHub Actions runs.",
   "main": "release.config.js",
