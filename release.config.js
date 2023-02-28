@@ -3,7 +3,7 @@ module.exports = {
     debug: false,
     dryRun: false,
     // eslint-disable-next-line no-template-curly-in-string
-    tagFormat: "from-remote:v${version}",
+    tagFormat: "from-remote-v${version}",
     branches: [
       // stable
       { name: 'main' },
