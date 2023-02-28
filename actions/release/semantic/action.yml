@@ -1,0 +1,41 @@
+name: "Advance or create tag"
+description: "Advance or create tag"
+
+inputs:
+  github-token:
+    description: The GitHub token used to create an authenticated client
+    required: true
+  npm-token:
+    description: The GitHub token used to create an authenticated client
+    required: true
+  branch:
+    description: The branch on which releases should happen
+    default: "main"
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+
+    - name: Semantic Release
+      uses: cycjimmy/semantic-release-action@v3
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        NPM_TOKEN: ${{ inputs.npm-token }}
+      with:
+        branch: ${{ inputs.branch }}
+        dry_run: false
+        extends: |
+          meero-com/github-actions-shared-workflows
+        extra_plugins: |
+          @semantic-release/commit-analyzer@9.0.2
+          @semantic-release/release-notes-generator@10.0.3
+          @semantic-release/changelog@6.0.1
+          @semantic-release/github@8.0.6
+          @semantic-release/git@10.0.1
+          @semantic-release/exec@6.0.3
+          @semantic-release/npm@9.0.1
+          conventional-changelog-conventionalcommits@4.3.0
