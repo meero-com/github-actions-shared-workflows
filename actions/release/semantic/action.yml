@@ -20,6 +20,18 @@ runs:
       with:
         node-version: '16.x'
 
+    - name: "Add package.json if missing"
+      run: |
+        FILE=package.json
+        if ! [ -f "$FILE" ]; then
+          echo '{' >> $FILE
+          echo '"name": "@${{ github.repository }}",' >> $FILE
+          echo '"version": "1.0.0",' >> $FILE
+          echo '"private": true' >> $FILE
+          echo '}' >> $FILE
+        fi
+      shell: bash
+
     - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v3
       env:
