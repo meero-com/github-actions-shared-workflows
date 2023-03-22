@@ -1,0 +1,45 @@
+name: "Upload artifact to S3"
+description: "Upload an artifact file to S3 Bucket"
+
+inputs:
+  AWS_ACCESS_KEY_ID:
+    description: "Aws access key"
+    required: true
+  AWS_SECRET_ACCESS_KEY:
+    description: "AWS secret"
+    required: true
+  AWS_REGION:
+    description: "AWS region"
+    required: true
+  ARTIFACT_NAME:
+    description: "Name of the Github Artifact (source)"
+    required: true
+  ARTIFACT_FILE_NAME:
+    description: "Filename to upload on S3 (source)"
+    required: true
+  S3_BUCKET_NAME:
+    description: "S3 bucket name to upload the file (destination)"
+    required: true
+  S3_OBJECT_FILENAME:
+    description: "Name of the upload object (destination)"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ inputs.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ inputs.AWS_REGION }}
+
+    - name: Fetch file artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: ${{ inputs.ARTIFACT_NAME }}
+
+    - name: Push the file to S3
+      shell: bash
+      run: |
+        aws s3 cp ${{ inputs.ARTIFACT_FILE_NAME }} s3://${{ inputs.S3_BUCKET_NAME }}/${{ inputs.S3_OBJECT_FILENAME }}
