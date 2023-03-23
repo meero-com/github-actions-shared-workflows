@@ -1,0 +1,29 @@
+name: "Extract version from tag"
+description: "Extract version number from semver tag. Must be run on tag reference."
+
+inputs:
+  PREFIX:
+    description: "Prefix of the tag (example 'prefix-v': 'prefix-v1.0.0' -> '1.0.0')"
+    required: false
+    default: 'v'
+
+outputs:
+  version_number:
+    description: "version number (ex: 1.0.0)"
+    value: ${{ steps.extract-version.outputs.version }}
+
+runs:
+  using: "composite"
+  steps:
+      - name: "extract version from refname"
+        id: extract-version
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const getVersion = function (ref_name) {
+              var rx = /${{ inputs.PREFIX }}([0-9]+\.[0-9]+\.[0-9]+)/g;
+              var arr = rx.exec(ref_name);
+              return arr[1]; 
+            }
+
+            core.setOutput('version', getVersion('${{ github.ref_name }}'))
