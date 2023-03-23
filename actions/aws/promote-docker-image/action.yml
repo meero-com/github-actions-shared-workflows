@@ -1,0 +1,102 @@
+name: "Promote Docker image"
+description: "Pull a Docker image, re-tag it and push it in another ECR"
+
+inputs:
+  version:
+    description: version short sha
+    required: true
+  artifact_name:
+    description: Name for artifact (without extension)
+    required: true
+  SOURCE_AWS_ACCESS_KEY_ID:
+    description: "Aws access key"
+    required: true
+  SOURCE_AWS_SECRET_ACCESS_KEY:
+    description: "AWS secret"
+    required: true
+  SOURCE_ECR_REPOSITORY:
+    description: "Source ECR repository"
+    required: true
+  TARGET_AWS_ACCESS_KEY_ID:
+    description: "Aws access key"
+    required: true
+  TARGET_AWS_SECRET_ACCESS_KEY:
+    description: "AWS secret"
+    required: true
+  TARGET_ECR_REPOSITORY:
+    description: "Target ECR repository"
+    required: true
+  AWS_REGION:
+    description: "AWS region"
+    required: true
+
+outputs:
+  artifact_name:
+    description: "Image artifact name"
+    value: ${{ inputs.artifact_name }}
+  artifact_file_name:
+    description: "Image artifact filename"
+    value: ${{ inputs.artifact_name }}.txt
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Configure AWS Credentials - Source account
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ inputs.SOURCE_AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ inputs.SOURCE_AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ inputs.AWS_REGION }}
+
+    - name: Login to the Amazon ECR - Source account
+      id: login-ecr-source
+      uses: aws-actions/amazon-ecr-login@v1
+    
+    - name: "Store Docker image URI from source account"
+      id: docker-uri-source
+      shell: bash
+      run: |
+        echo "image-uri=$(echo ${{ steps.login-ecr-source.outputs.registry }}/${{ inputs.SOURCE_ECR_REPOSITORY }}:${{ inputs.version }})" >> $GITHUB_OUTPUT
+
+    - name: Pull Docker image from source ECR
+      shell: bash
+      run: |
+        docker pull ${{ steps.docker-uri-source.outputs.image-uri }}
+
+    - name: Configure AWS Credentials - Target account
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ inputs.TARGET_AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ inputs.TARGET_AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ inputs.AWS_REGION }}
+
+    - name: Login to the Amazon ECR - Target account
+      id: login-ecr-target
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Tag & Push Docker image to target ECR
+      shell: bash
+      id: image-tags-uri
+      run: |
+        lambda_tag=${{ steps.login-ecr-target.outputs.registry }}/${{ inputs.TARGET_ECR_REPOSITORY }}:${{ inputs.version }}
+
+        docker tag ${{ steps.docker-uri-source.outputs.image-uri }} $lambda_tag
+        docker push $lambda_tag
+
+        echo "lambda=$lambda_tag" >> $GITHUB_OUTPUT
+
+    - name: Save ImageURI as artifact_name.txt
+      env:
+        IMAGE_URI: ${{ steps.image-tags-uri.outputs.lambda }}
+      run: |
+        echo $IMAGE_URI > ${{ inputs.artifact_name }}.txt
+      shell: bash
+
+    - name: Save Image URI as Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.artifact_name }}
+        path: ${{ inputs.artifact_name }}.txt
