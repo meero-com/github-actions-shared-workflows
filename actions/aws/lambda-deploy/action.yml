@@ -1,0 +1,54 @@
+name: "Deploy Lambda"
+description: "Deploy the Lambda Function"
+
+inputs:
+  AWS_ACCESS_KEY_ID:
+    description: "Aws access key"
+    required: true
+  AWS_SECRET_ACCESS_KEY:
+    description: "AWS secret"
+    required: true
+  AWS_REGION:
+    description: "AWS region"
+    required: true
+  LAMBDA_FUNCTION_NAME:
+    description: "Lambda function name"
+    required: true
+  artifact_name:
+    description: "name of Image artifact (container) to deploy"
+    required: true
+  artifact_filename:
+    description: "filename of Image artifact (container) to deploy"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Fetch Image URI artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: ${{ inputs.artifact_name }}
+
+    - name: Set variable image from artifact (image URI)
+      shell: bash
+      id: vars
+      run: echo "image=$(cat ${{ inputs.artifact_filename }})" >> $GITHUB_OUTPUT
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ inputs.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ inputs.AWS_REGION }}
+
+    - name: Update the Lambda code (new Docker image)
+      shell: bash
+      env:
+        IMAGE_URI: ${{ steps.vars.outputs.image }}
+        LAMBDA_FUNCTION_NAME: ${{ inputs.LAMBDA_FUNCTION_NAME }}
+      run: |
+        aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --image-uri $IMAGE_URI
+        aws lambda wait function-updated --function-name $LAMBDA_FUNCTION_NAME
+        result=$(aws lambda publish-version --function-name $LAMBDA_FUNCTION_NAME)
+        version=$(echo ${result}| jq -r .Version)
+        echo "Deployed version ${version} of the lambda $LAMBDA_FUNCTION_NAME"
