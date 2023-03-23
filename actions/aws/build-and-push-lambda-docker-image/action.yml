@@ -4,13 +4,13 @@ description: "Build lambda container image and push to AWS-ECR"
 inputs:
   version:
     description: version short sha
-    resuired: true
+    required: true
   dockerfile:
     description: path to docker file
-    resuired: true
+    required: true
   artifact_name:
     description: Name for artifact (without extension)
-    resuired: true
+    required: true
   AWS_ACCESS_KEY_ID:
     description: "Aws access key"
     required: true
