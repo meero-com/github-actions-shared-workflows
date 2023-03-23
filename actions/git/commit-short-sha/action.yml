@@ -1,0 +1,15 @@
+name: "Commit short sha"
+description: "get the current commit short sha"
+
+outputs:
+  commit_short_sha:
+    description: "Current commit short sha"
+    value: ${{ steps.commit-short-sha.outputs.sha8}}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Current commit short sha"
+      id: commit-short-sha
+      run: echo "sha8=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
+      shell: bash
