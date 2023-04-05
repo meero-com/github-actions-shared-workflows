@@ -39,11 +39,7 @@ runs:
         NPM_TOKEN: ${{ inputs.npm-token }}
       with:
         branches: |
-          [
-            "${{ inputs.branch }}",
-            ${{ inputs.branch }},
-            'master'
-          ]
+          ["${{ inputs.branch }}"]
         branch: 'oldconf'
         dry_run: false
         extends: |
