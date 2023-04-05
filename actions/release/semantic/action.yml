@@ -38,6 +38,10 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         NPM_TOKEN: ${{ inputs.npm-token }}
       with:
+        branches: |
+          [
+            ${{ inputs.branch }}
+          ]
         branch: ${{ inputs.branch }}
         dry_run: false
         extends: |
