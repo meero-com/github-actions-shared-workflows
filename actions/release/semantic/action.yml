@@ -40,8 +40,11 @@ runs:
       with:
         branches: |
           [
-            "${{ inputs.branch }}"
+            "${{ inputs.branch }}",
+            ${{ inputs.branch }},
+            'master'
           ]
+        branch: 'oldconf'
         dry_run: false
         extends: |
           @meero/github-actions-shared-workflows
