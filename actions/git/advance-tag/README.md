@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout Code"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v3"
 
       - name: "Move tag"
         uses: "meero-com/github-actions-shared-workflows/actions/git/advance-tag@main"
