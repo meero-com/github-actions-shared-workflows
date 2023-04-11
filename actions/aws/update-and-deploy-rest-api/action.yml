@@ -1,0 +1,53 @@
+name: "Update API Gateway"
+description: "Update API Gateway Rest API"
+
+inputs:
+  AWS_ACCESS_KEY_ID:
+    description: "Aws access key"
+    required: true
+  AWS_SECRET_ACCESS_KEY:
+    description: "AWS secret"
+    required: true
+  AWS_REGION:
+    description: "AWS region"
+    required: true
+  ARTIFACT_NAME:
+    description: "Name of the Github Artifact"
+    required: true
+  ARTIFACT_FILE_NAME:
+    description: "Filename to upload on S3"
+    required: true
+  APIGW_REST_API_ID:
+    description: "Api Gateway REST API ID"
+    required: true
+  APIGW_STAGE_NAME:
+    description: "Stage name"
+    required: true
+  APIGW_VERSION:
+    description: "Version of the API Gateway to deploy"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ inputs.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ inputs.AWS_REGION }}
+
+    - name: Fetch ApiGateway file artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: ${{ inputs.ARTIFACT_NAME }}
+
+    - name: Update Api
+      shell: bash
+      run: |
+        aws apigateway put-rest-api --rest-api-id ${{ inputs.APIGW_REST_API_ID }} --mode merge --body 'fileb://${{ inputs.ARTIFACT_FILE_NAME }}'
+    
+    - name: Deploy Api
+      shell: bash
+      run: |
+        aws apigateway create-deployment --rest-api-id ${{ inputs.APIGW_REST_API_ID }} --stage-name ${{ inputs.APIGW_STAGE_NAME }} --description 'Deploy version ${{ inputs.APIGW_VERSION }} from CICD'
