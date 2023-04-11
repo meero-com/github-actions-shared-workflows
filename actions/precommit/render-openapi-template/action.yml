@@ -1,0 +1,66 @@
+name: "Render OpenAPI ApiGateway file"
+description: "Render OpenAPI jinja template and validate it with manual pre-commit rules"
+
+inputs:
+  OPENAPI_API_NAME:
+    description: "Name of the api (-o of precommit render-jinja-template)"
+    required: true
+  version_identifier:
+    description: "uniq version identifier (commit short sha is perfect)"
+    required: true
+  hook_render:
+    description: Pre-commit hook name for jinja template rendering
+    default: render-jinja-template
+    required: false
+  hook_validate:
+    description: Pre-commit hook name for swagger validation
+    default: swagger-validation
+    required: false
+
+outputs:
+  apigw_version:
+    description: "Api Gateway version"
+    value: ${{ inputs.version_identifier }}
+  artifact_name:
+    description: "Api Gateway artifact name"
+    value: apigateway-file
+  artifact_file_name:
+    description: "Api Gateway file artifact name"
+    value: openapi-${{ inputs.OPENAPI_API_NAME }}-${{ inputs.version_identifier }}.json
+
+env:
+  PYTHON_VERSION: '3.10'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Generate openapi file
+      uses: pre-commit/action@v3.0.0
+      with:
+        extra_args: ${{ inputs.hook_render }} --hook-stage manual
+
+    # temp stage the openapi file (file not seen by pre-commit hook)
+    - name: stage openapi file
+      run: git add -f apigw/openapi*
+      shell: bash
+
+    - name: Validate openapi file
+      uses: pre-commit/action@v3.0.0
+      with:
+        extra_args: ${{ inputs.hook_validate }} --hook-stage manual
+
+    # cleanup git stage
+    - name: unstage openapi file
+      run: git reset HEAD -- apigw/openapi*
+      shell: bash
+
+    - name: Save ApiGateway file as Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: apigateway-file
+        path: apigw/openapi-${{ inputs.OPENAPI_API_NAME }}-${{ inputs.version_identifier }}.json
