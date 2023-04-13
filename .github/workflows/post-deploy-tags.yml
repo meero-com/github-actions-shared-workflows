@@ -1,0 +1,44 @@
+name: _PostDeployTags (subworkflow)
+
+on:
+  workflow_call:
+    inputs:
+      source_prefix:
+        description: "Prefix for the source tag on which the worflow run (tag-ref must start with: 'v', 'DEV-v'...)"
+        type: string
+        required: true
+
+      target_prefix:
+        description: "Prefix for the destination tag to create (without the v part: 'DEV', 'PREPROD'...)"
+        type: string
+        required: true
+    
+    secrets:
+      gh_token:
+        description: "Github token with private repo access"
+        required: true
+
+
+jobs:
+  advanceTags:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: "actions/checkout@v3"
+
+      - name: "Extract version"
+        id: extract-version
+        uses: "meero-com/github-actions-shared-workflows/actions/git/extract-version-from-tag@main"
+        with:
+          PREFIX: ${{ inputs.source_prefix }}
+
+      - name: "Create version release tag"
+        uses: "meero-com/github-actions-shared-workflows/actions/git/advance-tag@main"
+        with:
+          TAG_NAME: "${{ inputs.target_prefix }}-v${{ steps.extract-version.outputs.version_number }}"
+          github-token: ${{ secrets.gh_token }}
+
+      - name: "Move latest tag"
+        uses: "meero-com/github-actions-shared-workflows/actions/git/advance-tag@main"
+        with:
+          TAG_NAME: "${{ inputs.target_prefix }}-latest"
+          github-token: ${{ secrets.gh_token }}
