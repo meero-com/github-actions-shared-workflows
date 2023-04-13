@@ -1,6 +1,4 @@
-# AWS: build-and-push-lambda-docker-image
-
-**DEPRECATED: use actions/aws/build-and-push-docker-image**
+# AWS: build-and-push-docker-image
 
 ## Behavior
 
@@ -12,17 +10,17 @@ Save image as artifact and outputs artifact name and filename.
 
 ```yaml
 jobs:
-  build-lambda-container:
+  buildPushDocker:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout Code"
         uses: "actions/checkout@v3"
 
-      - name: "build-lambda-container"
-        uses: "meero-com/github-actions-shared-workflows/actions/aws/build-and-push-lambda-docker-image@main"
+      - name: "Build and Push docker container to ECR"
+        uses: "meero-com/github-actions-shared-workflows/actions/aws/build-and-push-docker-image@main"
         with:
           version: github-commit-sha
-          dockerfile: docker/lambda/Dockerfile
+          dockerfile: docker/Dockerfile
           artifact_name: image-uri
           AWS_ACCESS_KEY_ID: ${{ secrets.NP_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.NP_AWS_SECRET_ACCESS_KEY }}
