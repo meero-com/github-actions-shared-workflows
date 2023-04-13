@@ -1,6 +1,5 @@
-name: "Build and push lambda container image"
-description: "Build lambda container image and push to AWS-ECR"
-# DEPRECATED: use actions/aws/build-and-push-docker-image
+name: "Build and push container image"
+description: "Build docker container image and push to AWS-ECR"
 
 inputs:
   version:
@@ -56,9 +55,9 @@ runs:
       id: image-tags-uri
       shell: bash
       run: |
-        lambda_tag=${{ steps.login-ecr.outputs.registry }}/${{ inputs.ECR_REPOSITORY_NAME }}:${{ inputs.version }}
+        tag=${{ steps.login-ecr.outputs.registry }}/${{ inputs.ECR_REPOSITORY_NAME }}:${{ inputs.version }}
 
-        echo "lambda=$lambda_tag" >> $GITHUB_OUTPUT
+        echo "tag=$tag" >> $GITHUB_OUTPUT
 
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
@@ -66,14 +65,14 @@ runs:
       with:
         push: true
         file: ${{ inputs.dockerfile }}
-        tags: ${{ steps.image-tags-uri.outputs.lambda }}
+        tags: ${{ steps.image-tags-uri.outputs.tag }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
     - name: Save ImageURI as artifact_name.txt
       shell: bash
       env:
-        IMAGE_URI: ${{ steps.image-tags-uri.outputs.lambda }}
+        IMAGE_URI: ${{ steps.image-tags-uri.outputs.tag }}
       run: |
         echo $IMAGE_URI > ${{ inputs.artifact_name }}.txt
 
