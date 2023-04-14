@@ -1,0 +1,112 @@
+name: "ECS onejob task"
+description: "Run command with onejob ECS and fargate"
+
+inputs:
+  AWS_ACCESS_KEY_ID:
+    description: "Aws access key"
+    required: true
+  AWS_SECRET_ACCESS_KEY:
+    description: "AWS secret"
+    required: true
+  AWS_REGION:
+    description: "AWS region"
+    required: true
+
+  artifact_name:
+    description: "name of Image artifact (container) to use"
+    required: true
+  artifact_filename:
+    description: "filename of Image artifact (container) to deploy"
+    required: true
+
+  ECS_TASK_DEFINITION:
+    description: "Task definition name to fetch (ex: project-env-onejob)"
+    required: true
+  ECS_TASK_CLUSTER:
+    description: "CLuster for Task creation (ex: project-env)"
+    required: true
+  ecs_container_name:
+    description: 'The name of the container defined in the containerDefinitions section of the ECS task definition'
+    required: true
+  task_command:
+    description: 'Command to execute on container (ex:"alembic upgrade head")'
+    required: true
+
+
+  network_env_name:
+    description: "tag:Env value for network config"
+    required: true
+  network_product_name:
+    description: "tag:Product value for network config"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Fetch Image URI artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: ${{ inputs.artifact_name }}
+
+    - name: Set variable image from artifact (image URI)
+      shell: bash
+      id: vars
+      run: echo "image=$(cat ${{ inputs.artifact_filename }})" >> $GITHUB_OUTPUT
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ inputs.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ inputs.AWS_REGION }}
+
+    - name: Download current ECS task definition
+      id: download_ecs_task
+      shell: bash
+      run: |
+        task_def = task-definition-onejob.json
+        aws ecs describe-task-definition --task-definition ${{ inputs.ECS_TASK_DEFINITION }} --query taskDefinition > $task_def
+
+        echo "task=$task_def" >> $GITHUB_OUTPUT
+
+    - name: Build network configuration (only if network_mode is awsvpc)
+      shell: bash
+      id: networkConfiguration
+      run: |
+        subnets=$(aws ec2 describe-subnets --filters Name=tag:Name,Values="*private*" Name=tag:Scope,Values=private Name=tag:Env,Values=${{ inputs.network_env_name }} Name=tag:Product,Values=${{ inputs.network_product_name }} --query "Subnets[*].SubnetId" --output json)
+        securityGroups=$(aws ec2 describe-security-groups --filters Name=tag:Scope,Values=private Name=tag:Env,Values=${{ inputs.network_env_name }} Name=tag:Name,Values="*ecs*" Name=tag:Product,Values=${{ inputs.network_product_name }} --query "SecurityGroups[*].GroupId" --output json)
+
+        networkConfiguration=$(jq -c -n --argjson subnets "${subnets}" --argjson securityGroups "${securityGroups}" '{awsvpcConfiguration: {"subnets": $subnets, "securityGroups": $securityGroups, "assignPublicIp": "DISABLED"}}')
+
+        echo "networkConfiguration=$networkConfiguration" >> $GITHUB_OUTPUT
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: render-task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ steps.download_ecs_task.outputs.task }}
+        container-name: ${{ inputs.ecs_container_name }}
+        image: ${{ steps.vars.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+
+    - name: Run the migrations if any
+      shell: bash
+      run: |
+        IFS=' ' read -ra cmd_array <<< "${{ inputs.task_command }}"
+
+        separator='", "' # e.g. constructing regex, pray it does not contain %s
+        joined_cmd="$( printf "${separator}%s" "${cmd_array[@]}" )"
+        joined_cmd="${joined_cmd:${#separator}}" # remove leading separator
+
+        OVERRIDES_PATTERN='{"containerOverrides": [{"name": "${{ inputs.ecs_container_name }}", "command": %s}]}'
+        OVERRIDES="$( printf "$OVERRIDES_PATTERN" "[\"$joined_cmd\"]" )"
+
+        TASK_CREATION=$(aws ecs run-task --task-definition ${{ inputs.ECS_TASK_DEFINITION }} --cluster ${{ inputs.ECS_TASK_CLUSTER }} --launch-type FARGATE --network-configuration '${{ steps.networkConfiguration.outputs.networkConfiguration }}' --started-by github-actions --overrides="'$OVERRIDES'")
+        TASK_ARN=$(echo $TASK_CREATION | jq -r .tasks[0].taskArn)
+        aws ecs wait tasks-stopped --tasks $TASK_ARN --cluster ${{ inputs.ECS_TASK_CLUSTER }}
+        TASK_RESULT_CODE=$(aws ecs describe-tasks --task $TASK_ARN --cluster ${{ inputs.ECS_TASK_CLUSTER }} | jq -r .tasks[0].containers[0].exitCode)
+        exit $TASK_RESULT_CODE
