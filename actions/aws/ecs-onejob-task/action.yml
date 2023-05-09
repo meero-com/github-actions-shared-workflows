@@ -104,7 +104,7 @@ runs:
         OVERRIDES_PATTERN='{"containerOverrides": [{"name": "${{ inputs.ecs_container_name }}", "command": %s}]}'
         OVERRIDES="$( printf "$OVERRIDES_PATTERN" "[\"$joined_cmd\"]" )"
 
-        TASK_CREATION=$(aws ecs run-task --task-definition ${{ inputs.ECS_TASK_DEFINITION }} --cluster ${{ inputs.ECS_TASK_CLUSTER }} --launch-type FARGATE --network-configuration '${{ steps.networkConfiguration.outputs.networkConfiguration }}' --started-by github-actions --overrides="'$OVERRIDES'")
+        TASK_CREATION=$(aws ecs run-task --task-definition ${{ inputs.ECS_TASK_DEFINITION }} --cluster ${{ inputs.ECS_TASK_CLUSTER }} --launch-type FARGATE --network-configuration '${{ steps.networkConfiguration.outputs.networkConfiguration }}' --started-by github-actions --overrides="$OVERRIDES")
         TASK_ARN=$(echo $TASK_CREATION | jq -r .tasks[0].taskArn)
         aws ecs wait tasks-stopped --tasks $TASK_ARN --cluster ${{ inputs.ECS_TASK_CLUSTER }}
         TASK_RESULT_CODE=$(aws ecs describe-tasks --task $TASK_ARN --cluster ${{ inputs.ECS_TASK_CLUSTER }} | jq -r .tasks[0].containers[0].exitCode)
