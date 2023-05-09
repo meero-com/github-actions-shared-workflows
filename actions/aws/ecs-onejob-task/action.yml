@@ -64,10 +64,9 @@ runs:
       id: download_ecs_task
       shell: bash
       run: |
-        task_def = task-definition-onejob.json
-        aws ecs describe-task-definition --task-definition ${{ inputs.ECS_TASK_DEFINITION }} --query taskDefinition > $task_def
+        aws ecs describe-task-definition --task-definition ${{ inputs.ECS_TASK_DEFINITION }} --query taskDefinition > task-definition-onejob.json
 
-        echo "task=$task_def" >> $GITHUB_OUTPUT
+        echo "task=task-definition-onejob.json" >> $GITHUB_OUTPUT
 
     - name: Build network configuration (only if network_mode is awsvpc)
       shell: bash
