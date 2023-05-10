@@ -28,6 +28,9 @@ outputs:
   artifact_file_name:
     description: "Image artifact filename"
     value: ${{ inputs.artifact_name }}.tar
+  image_tag:
+    description: "Image tag"
+    value: ${{ steps.image-current-tag.outputs.tag }}
 
 runs:
   using: "composite"
@@ -64,10 +67,11 @@ runs:
         docker save --output /tmp/docker/${{ inputs.artifact_name }}.tar ${{ steps.docker-uri.outputs.image-uri }}
 
     - name: Save ImageURI as artifact_name.txt
+      id: image-current-tag
       env:
         IMAGE_URI: ${{ steps.docker-uri.outputs.image-uri }}
       run: |
-        echo $IMAGE_URI > ${{ inputs.artifact_name }}.txt
+        echo "tag=$IMAGE_URI" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Save Image URI as Artifact
