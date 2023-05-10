@@ -27,7 +27,7 @@ outputs:
     value: ${{ inputs.artifact_name }}
   artifact_file_name:
     description: "Image artifact filename"
-    value: ${{ inputs.artifact_name }}.txt
+    value: ${{ inputs.artifact_name }}.tar
 
 runs:
   using: "composite"
@@ -57,6 +57,11 @@ runs:
       run: |
         docker pull ${{ steps.docker-uri.outputs.image-uri }}
 
+    - name: Save Docker image as TAR
+      shell: bash
+      run: |
+        docker save --output tmp/docker/${{ inputs.artifact_name }}.tar ${{ steps.docker-uri.outputs.image-uri }}
+
     - name: Save ImageURI as artifact_name.txt
       env:
         IMAGE_URI: ${{ steps.docker-uri.outputs.image-uri }}
@@ -68,4 +73,4 @@ runs:
       uses: actions/upload-artifact@v3
       with:
         name: ${{ inputs.artifact_name }}
-        path: ${{ inputs.artifact_name }}.txt
+        path: tmp/docker/${{ inputs.artifact_name }}.tar
