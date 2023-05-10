@@ -56,7 +56,7 @@ runs:
       run: |
           docker_image_name=${{steps.dl-artifact.outputs.download-path}}/${{ inputs.artifact_file_name }}
 
-          docker load -t billing-db:src --input $docker_image_name
+          docker load --input $docker_image_name
 
           echo "docker_image_name=$docker_image_name" >> $GITHUB_OUTPUT
 
@@ -77,7 +77,7 @@ runs:
       run: |
         new_tag=${{ steps.login-ecr.outputs.registry }}/${{ inputs.ECR_REPOSITORY }}:${{ inputs.version }}
 
-        docker tag billing-db:src $new_tag
+        docker tag ${{ inputs.artifact_tag }} $new_tag
         docker push $new_tag
 
         echo "tag=$new_tag" >> $GITHUB_OUTPUT

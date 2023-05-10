@@ -69,7 +69,7 @@ runs:
       shell: bash
       run: |
         mkdir -p /tmp/docker
-        docker save --output /tmp/docker/${{ inputs.artifact_name }}.tar ${{ steps.docker-uri.outputs.image-uri }}
+        docker save --output /tmp/docker/${{ inputs.artifact_name }}.tar ${{ steps.pull-docker.outputs.tag }}
 
     - name: Save Image URI as Artifact
       uses: actions/upload-artifact@v3
