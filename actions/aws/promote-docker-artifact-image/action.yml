@@ -51,7 +51,11 @@ runs:
       id: docker-load
       shell: bash
       run: |
-          docker load --input ${{steps.dl-artifact.outputs.download-path}}/${{ inputs.artifact_file_name }}
+          docker_image_name=${{steps.dl-artifact.outputs.download-path}}/${{ inputs.artifact_file_name }}
+
+          docker load --input $docker_image_name
+
+          echo "docker_image_name=$docker_image_name" >> $GITHUB_OUTPUT
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
@@ -70,7 +74,7 @@ runs:
       run: |
         new_tag=${{ steps.login-ecr.outputs.registry }}/${{ inputs.ECR_REPOSITORY }}:${{ inputs.version }}
 
-        docker tag ${{ inputs.artifact_file_name }} $new_tag
+        docker tag ${{steps.docker-load.outputs.docker_image_name}} $new_tag
         docker push $new_tag
 
         echo "tag=$new_tag" >> $GITHUB_OUTPUT
