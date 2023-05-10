@@ -50,7 +50,7 @@ runs:
       id: docker-load
       shell: bash
       run: |
-          docker load --input ${{ inputs.artifact_file_name }}
+          docker load --input ${{ inputs.artifact_file_name }}/${{ inputs.artifact_file_name }}
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
