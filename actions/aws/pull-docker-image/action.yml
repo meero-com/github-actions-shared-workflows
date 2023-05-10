@@ -30,7 +30,7 @@ outputs:
     value: ${{ inputs.artifact_name }}.tar
   image_tag:
     description: "Image tag"
-    value: ${{ steps.image-current-tag.outputs.tag }}
+    value: ${{ steps.pull-docker.outputs.tag }}
 
 runs:
   using: "composite"
@@ -56,23 +56,20 @@ runs:
         echo "image-uri=$(echo ${{ steps.login-ecr.outputs.registry }}/${{ inputs.ECR_REPOSITORY }}:${{ inputs.version }})" >> $GITHUB_OUTPUT
 
     - name: Pull Docker image from ECR
+      id: pull-docker
       shell: bash
       run: |
         docker pull ${{ steps.docker-uri.outputs.image-uri }}
+
+        tmp_tag=source-billing-db:${{ inputs.version }}
+        docker tag ${{ steps.docker-uri.outputs.image-uri }} $tmp_tag
+        echo "tag=$tmp_tag" >> $GITHUB_OUTPUT
 
     - name: Save Docker image as TAR
       shell: bash
       run: |
         mkdir -p /tmp/docker
         docker save --output /tmp/docker/${{ inputs.artifact_name }}.tar ${{ steps.docker-uri.outputs.image-uri }}
-
-    - name: Save ImageURI as artifact_name.txt
-      id: image-current-tag
-      env:
-        IMAGE_URI: ${{ steps.docker-uri.outputs.image-uri }}
-      run: |
-        echo "tag=$IMAGE_URI" >> $GITHUB_OUTPUT
-      shell: bash
 
     - name: Save Image URI as Artifact
       uses: actions/upload-artifact@v3
