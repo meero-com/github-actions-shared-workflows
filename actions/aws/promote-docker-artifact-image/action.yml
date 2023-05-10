@@ -42,7 +42,7 @@ runs:
       id: dl-artifact
       with:
         name: ${{ inputs.artifact_name }}
-        path: ${{ inputs.artifact_file_name }}
+        path: path/to/docker/artifact
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
@@ -52,7 +52,8 @@ runs:
       shell: bash
       run: |
           echo ${{steps.dl-artifact.outputs.download-path}}
-          docker load --input ${{steps.dl-artifact.outputs.download-path}}
+          ls ${{steps.dl-artifact.outputs.download-path}}
+          docker load --input ${{steps.dl-artifact.outputs.download-path}}/${{ inputs.artifact_file_name }}
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
