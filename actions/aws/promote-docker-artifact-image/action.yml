@@ -39,6 +39,7 @@ runs:
   using: "composite"
   steps:
     - uses: actions/download-artifact@v3
+      id: dl-artifact
       with:
         name: ${{ inputs.artifact_name }}
         path: ${{ inputs.artifact_file_name }}
@@ -50,7 +51,8 @@ runs:
       id: docker-load
       shell: bash
       run: |
-          docker load --input ${{ inputs.artifact_file_name }}/${{ inputs.artifact_file_name }}
+          echo ${{steps.dl-artifact.outputs.download-path}}
+          docker load --input ${{steps.dl-artifact.outputs.download-path}}
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
