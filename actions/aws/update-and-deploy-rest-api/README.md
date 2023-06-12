@@ -26,6 +26,7 @@ jobs:
           APIGW_REST_API_ID: ${{ secrets.APIGW_ID }}
           APIGW_STAGE_NAME: stage_v1
           APIGW_VERSION: api_version_to_deploy
+          apigw_put_mode: merge # default value
 ```
 
 Beware of using a `@ref` (`@main` in the example above) which suits your stability requirements in your workflow:
