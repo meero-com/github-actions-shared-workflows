@@ -26,6 +26,10 @@ inputs:
   APIGW_VERSION:
     description: "Version of the API Gateway to deploy"
     required: true
+  apigw_put_mode:
+    description: update mode of put-rest-api call (merge|overwrite)
+    default: merge
+    required: false
 
 runs:
   using: "composite"
@@ -45,7 +49,7 @@ runs:
     - name: Update Api
       shell: bash
       run: |
-        aws apigateway put-rest-api --rest-api-id ${{ inputs.APIGW_REST_API_ID }} --mode merge --body 'fileb://${{ inputs.ARTIFACT_FILE_NAME }}'
+        aws apigateway put-rest-api --rest-api-id ${{ inputs.APIGW_REST_API_ID }} --mode ${{ inputs.apigw_put_mode }} --body 'fileb://${{ inputs.ARTIFACT_FILE_NAME }}'
     
     - name: Deploy Api
       shell: bash
