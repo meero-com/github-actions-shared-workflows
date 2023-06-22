@@ -1,0 +1,54 @@
+name: "Publish ApiDoc"
+description: "Copy the swagger/openapi file to internal ApiDoc bucket"
+
+inputs:
+  API_PROJECT_NAME:
+    description: "Name of the project"
+    required: true
+  API_ENVIRONMENT:
+    description: "Environment of the API (dev|pp|prd|...)"
+    required: true
+  API_NAME:
+    description: "Name of the API (default: api)"
+    required: false
+    default: api
+  API_VERSION:
+    description: "Version/stage of the api (default: v1)"
+    required: false
+    default: v1
+  API_EXTENSION:
+    description: "Extension of the openapi file (default:yml|json)"
+    required: false
+    default: yml
+  AWS_ACCESS_KEY_ID:
+    description: "Aws access key"
+    required: true
+  AWS_SECRET_ACCESS_KEY:
+    description: "AWS secret"
+    required: true
+  AWS_REGION:
+    description: "AWS region"
+    required: true
+  ARTIFACT_NAME:
+    description: "Name of the Github Artifact (source)"
+    required: true
+  ARTIFACT_FILE_NAME:
+    description: "Filename to upload on S3 (source)"
+    required: true
+  S3_BUCKET_NAME:
+    description: "S3 bucket name to upload the file (destination)"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Upload OpenAPI file to S3"
+      uses: "meero-com/github-actions-shared-workflows/actions/aws/s3-upload-artifact@main"
+      with:
+        AWS_ACCESS_KEY_ID: ${{ inputs.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ inputs.AWS_REGION }}
+        ARTIFACT_NAME: ${{ inputs.ARTIFACT_NAME }}
+        ARTIFACT_FILE_NAME: ${{ inputs.ARTIFACT_FILE_NAME }}
+        S3_BUCKET_NAME: ${{ inputs.S3_BUCKET_NAME }}
+        S3_OBJECT_FILENAME: openapis/${{ inputs.API_PROJECT_NAME }}-${{ inputs.API_ENVIRONMENT }}-${{ inputs.API_NAME }}-${{ inputs.API_VERSION }}.${{ inputs.API_EXTENSION }}
