@@ -14,6 +14,10 @@ inputs:
   LAMBDA_FUNCTION_NAME:
     description: "Lambda function name"
     required: true
+  LAMBDA_FUNCTION_ALIAS:
+    description: "Lambda function alias"
+    required: false
+    default: ""
   artifact_name:
     description: "name of Image artifact (container) to deploy"
     required: true
@@ -42,6 +46,7 @@ runs:
         aws-region: ${{ inputs.AWS_REGION }}
 
     - name: Update the Lambda code (new Docker image)
+      id: update_function
       shell: bash
       env:
         IMAGE_URI: ${{ steps.vars.outputs.image }}
@@ -51,4 +56,17 @@ runs:
         aws lambda wait function-updated --function-name $LAMBDA_FUNCTION_NAME
         result=$(aws lambda publish-version --function-name $LAMBDA_FUNCTION_NAME)
         version=$(echo ${result}| jq -r .Version)
+        echo "lambda_version=$version" >> $GITHUB_OUTPUT
         echo "Deployed version ${version} of the lambda $LAMBDA_FUNCTION_NAME"
+
+    - name: Update the Lambda Alias
+      id: update_function_alias
+      if: ${{ inputs.LAMBDA_FUNCTION_ALIAS != '' }}
+      shell: bash
+      env:
+        LAMBDA_FUNCTION_VERSION: ${{ steps.vars.update_function.lambda_version }}
+        LAMBDA_FUNCTION_NAME: ${{ inputs.LAMBDA_FUNCTION_NAME }}
+        LAMBDA_FUNCTION_ALIAS: ${{ inputs.LAMBDA_FUNCTION_ALIAS }}
+      run: |
+        aws lambda update-alias --function-name $LAMBDA_FUNCTION_NAME --name $LAMBDA_FUNCTION_ALIAS --function-version $LAMBDA_FUNCTION_VERSION
+        echo "Alias updated"
