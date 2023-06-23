@@ -5,6 +5,7 @@
 Download specified artifact.
 Connect to AWS.
 Update the lambda code and publish a new version
+Optionaly update the function alias to the deployed version
 
 ## Usage
 
@@ -25,6 +26,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.NP_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           LAMBDA_FUNCTION_NAME: my-wonderful-lambda
+          LAMBDA_FUNCTION_ALIAS: foo-bar-lambda-alias
 ```
 
 Beware of using a `@ref` (`@main` in the example above) which suits your stability requirements in your workflow:
