@@ -31,6 +31,14 @@ inputs:
     default: merge
     required: false
 
+outputs:
+  openapi_artifact_name:
+    description: "Artifact Name for exported openapi file (YML)"
+    value: ${{ steps.export_openapi.outputs.openapi_artifact_name }}
+  openapi_artifact_filename:
+    description: "Artifact FileName for exported openapi file (YML)"
+    value: ${{ steps.export_openapi.outputs.openapi_artifact_filename }}
+
 runs:
   using: "composite"
   steps:
@@ -55,3 +63,21 @@ runs:
       shell: bash
       run: |
         aws apigateway create-deployment --rest-api-id ${{ inputs.APIGW_REST_API_ID }} --stage-name ${{ inputs.APIGW_STAGE_NAME }} --description 'Deploy version ${{ inputs.APIGW_VERSION }} from CICD'
+
+    - name: Export Openapi
+      id: export_openapi
+      shell: bash
+      run: |
+        openapi_artifact_name=openapi-export
+        openapi_artifact_filename=${{ inputs.APIGW_REST_API_ID }}-${{ inputs.APIGW_STAGE_NAME }}-${{ inputs.APIGW_VERSION }}.yml
+
+        aws apigateway get-export --rest-api-id ${{ inputs.APIGW_REST_API_ID }} --stage-name ${{ inputs.APIGW_STAGE_NAME }} --export-type oas30 --accepts application/yaml $openapi_artifact_filename
+
+        echo "openapi_artifact_name=$openapi_artifact_name" >> $GITHUB_OUTPUT
+        echo "openapi_artifact_filename=$openapi_artifact_filename" >> $GITHUB_OUTPUT
+
+    - name: Save Image URI as Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ steps.export_openapi.outputs.openapi_artifact_name }}
+        path: ${{ steps.export_openapi.outputs.openapi_artifact_filename }}

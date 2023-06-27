@@ -2,8 +2,9 @@
 
 ## Behavior
 
-Push new openapi definition
-Deploy ApiGw on specified stage
+- Push new openapi definition
+- Deploy ApiGw on specified stage
+- export deployed api as openapi (yml) file
 
 ## Usage
 
@@ -16,6 +17,7 @@ jobs:
         uses: "actions/checkout@v3"
 
       - name: "Update & Deploy Rest API"
+        id: deploy_rest_apigw
         uses: "meero-com/github-actions-shared-workflows/actions/aws/update-and-deploy-rest-api@main"
         with:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -28,6 +30,13 @@ jobs:
           APIGW_VERSION: api_version_to_deploy
           apigw_put_mode: merge # default value
 ```
+
+will output
+```yaml
+openapi_artifact_name: openapi-export
+openapi_artifact_filename: ${{ secrets.APIGW_ID }}-stage_v1-api_version_to_deploy.yml
+```
+use `action/download-artifact` to use them
 
 Beware of using a `@ref` (`@main` in the example above) which suits your stability requirements in your workflow:
 
