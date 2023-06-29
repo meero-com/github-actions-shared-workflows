@@ -69,7 +69,7 @@ runs:
       shell: bash
       run: |
         openapi_artifact_name=openapi-export
-        openapi_artifact_filename=${{ inputs.APIGW_REST_API_ID }}-${{ inputs.APIGW_STAGE_NAME }}-${{ inputs.APIGW_VERSION }}.yml
+        openapi_artifact_filename=openapi-export.yml
 
         aws apigateway get-export --rest-api-id ${{ inputs.APIGW_REST_API_ID }} --stage-name ${{ inputs.APIGW_STAGE_NAME }} --export-type oas30 --accepts application/yaml $openapi_artifact_filename
 
