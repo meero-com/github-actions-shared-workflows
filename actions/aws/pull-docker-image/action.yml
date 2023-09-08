@@ -27,7 +27,7 @@ outputs:
     value: ${{ inputs.artifact_name }}
   artifact_file_name:
     description: "Image artifact filename"
-    value: ${{ inputs.artifact_name }}.tar
+    value: ${{ inputs.artifact_name }}.tar.gz
   image_tag:
     description: "Image tag"
     value: ${{ steps.pull-docker.outputs.tag }}
@@ -69,10 +69,10 @@ runs:
       shell: bash
       run: |
         mkdir -p /tmp/docker
-        docker save --output /tmp/docker/${{ inputs.artifact_name }}.tar ${{ steps.pull-docker.outputs.tag }}
+        docker save ${{ steps.pull-docker.outputs.tag }} | gzip > /tmp/docker/${{ inputs.artifact_name }}.tar.gz
 
     - name: Save Image URI as Artifact
       uses: actions/upload-artifact@v3
       with:
         name: ${{ inputs.artifact_name }}
-        path: /tmp/docker/${{ inputs.artifact_name }}.tar
+        path: /tmp/docker/${{ inputs.artifact_name }}.tar.gz
