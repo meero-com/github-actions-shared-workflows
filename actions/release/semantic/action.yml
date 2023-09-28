@@ -1,5 +1,5 @@
-name: "Advance or create tag"
-description: "Advance or create tag"
+name: "Semantic release"
+description: "Semantic release"
 
 inputs:
   github-token:
@@ -12,6 +12,18 @@ inputs:
     description: The branch on which releases should happen
     default: "main"
     required: false
+  dry-run:
+    description: Whether to run semantic release in dry-run mode
+    default: false
+    required: false
+
+outputs:
+  new_release_published:
+    description: "Whether a new release was published ('true' or 'false')"
+    value: ${{ steps.semantic-release.outputs.new_release_published }}
+  new_release_version:
+    description: "Version of the new release"
+    value: ${{ steps.semantic-release.outputs.new_release_version }}
 
 runs:
   using: "composite"
@@ -33,6 +45,7 @@ runs:
       shell: bash
 
     - name: Semantic Release
+      id: semantic-release
       uses: cycjimmy/semantic-release-action@v3
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
@@ -41,7 +54,7 @@ runs:
         branches: |
           ["${{ inputs.branch }}"]
         branch: 'oldconf'
-        dry_run: false
+        dry_run: ${{ inputs.dry-run }}
         extends: |
           @meero/github-actions-shared-workflows
         extra_plugins: |
