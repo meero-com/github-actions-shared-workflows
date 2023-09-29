@@ -57,7 +57,7 @@ runs:
     - name: Build version name
       id: build-version
       run: |
-        if [[ ${{ inputs.version_name}} == "" ]]; then
+        if [[ "${{ inputs.version_name}}" == "" ]]; then
           echo "version=${{ inputs.version_prefix }}${{ steps.extract_version.outputs.version_number }}" >> $GITHUB_OUTPUT
         else
           echo "version=${{ inputs.version_name }}" >> $GITHUB_OUTPUT
