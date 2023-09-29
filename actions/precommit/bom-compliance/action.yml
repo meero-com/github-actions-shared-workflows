@@ -1,0 +1,80 @@
+name: "Check BOM compliance"
+description: "Check BOM compliance in given environment"
+
+inputs:
+  gh_token:
+    description: "Github token with private repo access"
+    required: true
+  target_env:
+    description: Target env name (dev, pp, prd...)
+    required: true
+  hook_name:
+    description: Pre-commit hook name for bom-env-compliance
+    default: bom-env-compliance
+    required: false
+  log_file_name:
+    description: hook log file name
+    default: bom_compliance.txt
+    required: false
+  semver_tag_prefix:
+    description: semver github ref prefix
+    default: v
+    required: false
+  version_prefix:
+    description: Version prefix (eg v -> v1.2.3)
+    default: v
+    required: false
+  version_name:
+    description: Force version name
+    default: ""
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Build version name
+      id: override-version-name
+      run: |
+        if [[ ${{ inputs.version_name}} == '' ]]; then
+          echo "override=false" >> $GITHUB_OUTPUT
+        else
+          echo "override=true" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
+
+    - name: Extract version from tag
+      id: extract_version
+      if: ${{ steps.override-version-name.outputs.override == 'false' }}
+      uses: "meero-com/github-actions-shared-workflows/actions/git/extract-version-from-tag@main"
+      with:
+        PREFIX: ${{ inputs.semver_tag_prefix }}
+
+    - name: Build version name
+      id: build-version
+      run: |
+        if [[ ${{ inputs.version_name}} == "" ]]; then
+          echo "version=${{ inputs.version_prefix }}${{ steps.extract_version.outputs.version_number }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=${{ inputs.version_name }}" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
+
+    - name: BOM compliance
+      uses: pre-commit/action@v3.0.0
+      with:
+        extra_args: ${{ inputs.hook_name }} --hook-stage manual
+      env:
+        GH_TOKEN: ${{ inputs.gh_token }}
+        CURRENT_LOCAL_VERSION_TAG: ${{ steps.build-version.outputs.version }}
+        CURRENT_TARGET_ENV: ${{ inputs.target_env }}
+
+    - name: Log compliance report
+      if: ${{ always() }}
+      run: |
+        while IFS= read -r line; do echo "$line"; done < <(grep -v -e "^$" < ${{ inputs.log_file_name }})
+      shell: bash
