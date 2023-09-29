@@ -40,7 +40,7 @@ runs:
     - name: Build version name
       id: override-version-name
       run: |
-        if [[ ${{ inputs.version_name}} == '' ]]; then
+        if [[ "${{ inputs.version_name}}" == '' ]]; then
           echo "override=false" >> $GITHUB_OUTPUT
         else
           echo "override=true" >> $GITHUB_OUTPUT
