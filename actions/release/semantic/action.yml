@@ -13,6 +13,14 @@ inputs:
     default: "main"
     required: false
 
+outputs:
+  published:
+    description: "Whether a new release was published. The return value is in the form of a string. ('true' or 'false')"
+    value: ${{ steps.semantic-release.outputs.new_release_published }}
+  version:
+    description: "New version released"
+    value: ${{ steps.semantic-release.outputs.new_release_version }}
+
 runs:
   using: "composite"
   steps:
@@ -33,6 +41,7 @@ runs:
       shell: bash
 
     - name: Semantic Release
+      id: semantic-release
       uses: cycjimmy/semantic-release-action@v3
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
