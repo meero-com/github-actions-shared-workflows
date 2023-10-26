@@ -1,0 +1,29 @@
+name: "Github auth GIT global"
+description: "github token auth in global git config"
+
+inputs:
+  github-token:
+    description: The GitHub token used to create an authenticated client
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: git credentials path
+      id: git-credentials
+      run: |
+        store_path=$(pwd)/.git-credentials
+        echo "path=$store_path" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Global Git auth
+      uses: gacts/run-and-post-run@v1
+      env:
+        credential_path: ${{ steps.git-credentials.outputs.path }}
+      with:
+        run: |
+          git config --global credential.helper "store --file=$credential_path"
+          echo "https://${{ inputs.github-token }}:@github.com" > $credential_path
+        post: |
+          git config --global --unset credential.helper
+          rm $credential_path
