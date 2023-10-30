@@ -3,7 +3,7 @@ description: "Check BOM compliance in given environment"
 
 inputs:
   gh_token:
-    description: "Github token with private repo access"
+    description: "Github token with private repo access - both pr-commit and bom repos"
     required: true
   target_env:
     description: Target env name (dev, pp, prd...)
@@ -32,6 +32,11 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: git-global-auth
+      uses: "meero-com/github-actions-shared-workflows/actions/git/git-auth-global@main"
+      with:
+        github-token: ${{ inputs.gh_token }}
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
