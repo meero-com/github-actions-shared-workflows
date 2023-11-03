@@ -2,12 +2,13 @@
 
 ## Behavior
 
-Promote Docker artifact image
+Promote Docker artifact/cached image
 
-- Download artifact image
+- Restore cached image
 - load into Docker
 - re-tag it and push it to ECR
-- Save image as artifact and outputs artifact name and filename.
+- Save image_uri (docker tag) as artifact
+- outputs artifact name and filename.
 
 ## Usage
 

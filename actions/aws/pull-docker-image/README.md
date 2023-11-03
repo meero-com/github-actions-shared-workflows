@@ -3,7 +3,7 @@
 ## Behavior
 
 Pull a Docker image from ECR
-Save image as artifact and outputs artifact name and filename.
+Save image in cache and outputs cache key and path.
 
 ## Usage
 
@@ -28,8 +28,8 @@ jobs:
 
 will output
 ```yaml
-artifact_name: image-uri
-artifact_file_name: image-uri.txt
+artifact_name: image-uri-345678-6
+artifact_file_name: /tmp/docker/image-uri.txt
 ```
 
 Beware of using a `@ref` (`@main` in the example above) which suits your stability requirements in your workflow:
