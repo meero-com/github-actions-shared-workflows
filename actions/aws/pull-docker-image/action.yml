@@ -20,14 +20,18 @@ inputs:
   AWS_REGION:
     description: "AWS region"
     required: true
+  docker_folder:
+    description: "temp folder to store docker images"
+    required: false
+    default: "/tmp/docker"
 
 outputs:
   artifact_name:
     description: "Image artifact name"
-    value: ${{ inputs.artifact_name }}
+    value: ${{ steps.artifact-keys.outputs.key }}
   artifact_file_name:
     description: "Image artifact filename"
-    value: ${{ inputs.artifact_name }}.tar.gz
+    value: ${{ steps.artifact-keys.outputs.path }}
   image_tag:
     description: "Image tag"
     value: ${{ steps.pull-docker.outputs.tag }}
@@ -35,6 +39,12 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - id: artifact-keys
+      shell: bash
+      run: |
+        echo "key=$(echo ${{ inputs.artifact_name }}-${{ github.run_id }}-${{ github.run_attempt }})" >> $GITHUB_OUTPUT
+        echo "path=$(echo ${{ inputs.docker_folder }}/${{ inputs.artifact_name }}.tar.gz)" >> $GITHUB_OUTPUT
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
@@ -68,11 +78,11 @@ runs:
     - name: Save Docker image as TAR
       shell: bash
       run: |
-        mkdir -p /tmp/docker
-        docker save ${{ steps.pull-docker.outputs.tag }} | gzip > /tmp/docker/${{ inputs.artifact_name }}.tar.gz
+        mkdir -p ${{ inputs.docker_folder }}
+        docker save ${{ steps.pull-docker.outputs.tag }} | gzip > ${{ steps.artifact-keys.outputs.path }}
 
-    - name: Save Image URI as Artifact
-      uses: actions/upload-artifact@v3
+    - name: Save Docker image in Cache
+      uses: actions/cache/save@v3
       with:
-        name: ${{ inputs.artifact_name }}
-        path: /tmp/docker/${{ inputs.artifact_name }}.tar.gz
+        key: ${{ steps.artifact-keys.outputs.key }}
+        path: ${{ steps.artifact-keys.outputs.path }}

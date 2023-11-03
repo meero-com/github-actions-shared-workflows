@@ -41,11 +41,12 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/cache/restore@v3
       id: dl-artifact
       with:
-        name: ${{ inputs.artifact_name }}
-        path: path/to/artifact
+        key: ${{ inputs.artifact_name }}
+        path: ${{ inputs.artifact_file_name }}
+        fail-on-cache-miss: true
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
@@ -54,7 +55,7 @@ runs:
       id: docker-load
       shell: bash
       run: |
-          docker_image_name=${{steps.dl-artifact.outputs.download-path}}/${{ inputs.artifact_file_name }}
+          docker_image_name=${{ inputs.artifact_file_name }}
 
           docker load --input $docker_image_name
 
