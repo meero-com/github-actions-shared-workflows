@@ -59,6 +59,20 @@ runs:
         echo "lambda_version=$version" >> $GITHUB_OUTPUT
         echo "Deployed version ${version} of the lambda $LAMBDA_FUNCTION_NAME"
 
+    - name: Add or update Datadog environment variables
+      id: datadog-env-vars
+      shell: bash
+      env:
+        IMAGE_URI: ${{ steps.vars.outputs.image }}
+        LAMBDA_FUNCTION_NAME: ${{ inputs.LAMBDA_FUNCTION_NAME }}
+      run: |
+        export EXTRACTED_VERSION=$(echo $IMAGE_URI | sed "s|.*:||g")
+        UPDATED_ENVIRONMENT_VARIABLES=$(aws lambda get-function-configuration --function-name ${LAMBDA_FUNCTION_NAME} | \
+          jq --compact-output ".Environment + {\"Variables\": (.Environment.Variables + {\"DD_VERSION\": env.EXTRACTED_VERSION, \"DD_GIT_COMMIT_SHA\": env.GITHUB_SHA })}")
+
+        aws lambda update-function-configuration --function-name ${LAMBDA_FUNCTION_NAME} \
+          --environment ${UPDATED_ENVIRONMENT_VARIABLES}
+
     - name: Update the Lambda Alias
       id: update_function_alias
       if: ${{ inputs.LAMBDA_FUNCTION_ALIAS != '' }}
