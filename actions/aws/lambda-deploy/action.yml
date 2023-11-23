@@ -60,7 +60,11 @@ runs:
         echo "Deployed version ${version} of the lambda $LAMBDA_FUNCTION_NAME"
 
     - name: Add or update Datadog environment variables
+      id: datadog-env-vars
       shell: bash
+      env:
+        IMAGE_URI: ${{ steps.vars.outputs.image }}
+        LAMBDA_FUNCTION_NAME: ${{ inputs.LAMBDA_FUNCTION_NAME }}
       run: |
         EXTRACT_VERSION=$(echo $IMAGE_URI | sed "s|.*:||g")
         UPDATED_ENVIRONMENT_VARIABLES=$(aws lambda get-function-configuration --function-name ${LAMBDA_FUNCTION_NAME} | \
