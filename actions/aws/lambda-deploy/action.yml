@@ -66,9 +66,9 @@ runs:
         IMAGE_URI: ${{ steps.vars.outputs.image }}
         LAMBDA_FUNCTION_NAME: ${{ inputs.LAMBDA_FUNCTION_NAME }}
       run: |
-        EXTRACT_VERSION=$(echo $IMAGE_URI | sed "s|.*:||g")
+        export EXTRACTED_VERSION=$(echo $IMAGE_URI | sed "s|.*:||g")
         UPDATED_ENVIRONMENT_VARIABLES=$(aws lambda get-function-configuration --function-name ${LAMBDA_FUNCTION_NAME} | \
-          jq --compact-output ".Environment + {\"Variables\": (.Environment.Variables + {\"DD_VERSION\": env.EXTRACT_VERSION, \"DD_GIT_COMMIT_SHA\": env.GITHUB_SHA })}")
+          jq --compact-output ".Environment + {\"Variables\": (.Environment.Variables + {\"DD_VERSION\": env.EXTRACTED_VERSION, \"DD_GIT_COMMIT_SHA\": env.GITHUB_SHA })}")
 
         aws lambda update-function-configuration --function-name ${LAMBDA_FUNCTION_NAME} \
           --environment ${UPDATED_ENVIRONMENT_VARIABLES}
