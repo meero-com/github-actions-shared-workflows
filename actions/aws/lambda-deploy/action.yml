@@ -78,7 +78,7 @@ runs:
       if: ${{ inputs.LAMBDA_FUNCTION_ALIAS != '' }}
       shell: bash
       env:
-        LAMBDA_FUNCTION_VERSION: ${{ steps.update_function.lambda_version }}
+        LAMBDA_FUNCTION_VERSION: ${{ steps.update_function.outputs.lambda_version }}
         LAMBDA_FUNCTION_NAME: ${{ inputs.LAMBDA_FUNCTION_NAME }}
         LAMBDA_FUNCTION_ALIAS: ${{ inputs.LAMBDA_FUNCTION_ALIAS }}
       run: |
