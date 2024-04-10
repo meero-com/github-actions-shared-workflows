@@ -62,7 +62,7 @@ runs:
 
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         push: true
         file: ${{ inputs.dockerfile }}
