@@ -70,7 +70,7 @@ runs:
       shell: bash
 
     - name: BOM compliance
-      uses: pre-commit/action@v3.0.0
+      uses: pre-commit/action@v3.0.1
       with:
         extra_args: ${{ inputs.hook_name }} --hook-stage manual
       env:
