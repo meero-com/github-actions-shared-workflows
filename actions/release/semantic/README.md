@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout Code"
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v4"
         with:
           persist-credentials: false
 
@@ -32,11 +32,11 @@ Beware of using a `@ref` (`@main` in the example above) which suits your stabili
 
 To operate on protected branches you must pass a github Personal Access Token as github-token.
 AND
-Avoid persisting credentials as part of actions/checkout@v3 by setting the parameter persist-credentials: false.
+Avoid persisting credentials as part of actions/checkout@v4 by setting the parameter persist-credentials: false.
 
 ```yaml
       - name: "Checkout Code"
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v4"
         with:
           persist-credentials: false
 ```

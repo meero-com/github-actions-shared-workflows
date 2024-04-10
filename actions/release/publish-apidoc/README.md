@@ -13,7 +13,7 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: "Checkout Code"
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v4"
 
       - name: "Upload OpenAPI file to ApiDoc"
         uses: "meero-com/github-actions-shared-workflows/actions/release/publish-apidoc@main"
