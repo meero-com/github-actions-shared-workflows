@@ -27,7 +27,7 @@ jobs:
           name: "HTML Documentation"
           path: docs/build/html/
           retention-days: 3
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         if: github.event_name == 'pull_request' && success()
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
