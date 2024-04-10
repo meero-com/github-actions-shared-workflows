@@ -41,7 +41,7 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/cache/restore@v3
+    - uses: actions/cache/restore@v4
       id: dl-artifact
       with:
         key: ${{ inputs.artifact_name }}

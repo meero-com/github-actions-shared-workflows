@@ -82,7 +82,7 @@ runs:
         docker save ${{ steps.pull-docker.outputs.tag }} | gzip > ${{ steps.artifact-keys.outputs.path }}
 
     - name: Save Docker image in Cache
-      uses: actions/cache/save@v3
+      uses: actions/cache/save@v4
       with:
         key: ${{ steps.artifact-keys.outputs.key }}
         path: ${{ steps.artifact-keys.outputs.path }}
