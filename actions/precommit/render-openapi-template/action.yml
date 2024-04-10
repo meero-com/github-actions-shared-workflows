@@ -39,7 +39,7 @@ runs:
         python-version: ${{ env.PYTHON_VERSION }}
 
     - name: Generate openapi file
-      uses: pre-commit/action@v3.0.0
+      uses: pre-commit/action@v3.0.1
       with:
         extra_args: ${{ inputs.hook_render }} --hook-stage manual
 
@@ -49,7 +49,7 @@ runs:
       shell: bash
 
     - name: Validate openapi file
-      uses: pre-commit/action@v3.0.0
+      uses: pre-commit/action@v3.0.1
       with:
         extra_args: ${{ inputs.hook_validate }} --hook-stage manual
 

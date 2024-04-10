@@ -23,7 +23,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Run pre-commit rules
-        uses: pre-commit/action@v3.0.0
+        uses: pre-commit/action@v3.0.1
 
   workflow-validation:
     name: Github Action Workflows validation
