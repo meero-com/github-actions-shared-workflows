@@ -62,7 +62,7 @@ runs:
           echo "docker_image_name=$docker_image_name" >> $GITHUB_OUTPUT
 
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ inputs.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ inputs.AWS_SECRET_ACCESS_KEY }}

@@ -42,7 +42,7 @@ runs:
         version: v0.9.1
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ inputs.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
