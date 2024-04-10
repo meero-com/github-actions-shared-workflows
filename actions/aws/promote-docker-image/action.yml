@@ -53,7 +53,7 @@ runs:
 
     - name: Login to the Amazon ECR - Source account
       id: login-ecr-source
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
     
     - name: "Store Docker image URI from source account"
       id: docker-uri-source
@@ -75,7 +75,7 @@ runs:
 
     - name: Login to the Amazon ECR - Target account
       id: login-ecr-target
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
 
     - name: Tag & Push Docker image to target ECR
       shell: bash

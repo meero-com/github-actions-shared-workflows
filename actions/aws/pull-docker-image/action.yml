@@ -57,7 +57,7 @@ runs:
 
     - name: Login to the Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
     
     - name: "Store Docker image URI"
       id: docker-uri
