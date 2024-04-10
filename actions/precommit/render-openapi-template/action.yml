@@ -32,9 +32,9 @@ runs:
   using: "composite"
   steps:
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       env:
-        PYTHON_VERSION: '3.10'
+        PYTHON_VERSION: '3.12'
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
