@@ -1,6 +1,9 @@
-name: "Github Workflows syntax"
+name: CI + release
 
 on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
   pull_request:
 
 env:
