@@ -45,7 +45,7 @@ runs:
       uses: docker/setup-buildx-action@v2
 
     - name: Configure AWS Credentials - Source account
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ inputs.SOURCE_AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ inputs.SOURCE_AWS_SECRET_ACCESS_KEY }}
@@ -67,7 +67,7 @@ runs:
         docker pull ${{ steps.docker-uri-source.outputs.image-uri }}
 
     - name: Configure AWS Credentials - Target account
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ inputs.TARGET_AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ inputs.TARGET_AWS_SECRET_ACCESS_KEY }}
