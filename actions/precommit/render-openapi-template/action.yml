@@ -28,14 +28,13 @@ outputs:
     description: "Api Gateway file artifact name"
     value: openapi-${{ inputs.OPENAPI_API_NAME }}-${{ inputs.version_identifier }}.json
 
-env:
-  PYTHON_VERSION: '3.10'
-
 runs:
   using: "composite"
   steps:
     - name: Set up Python
       uses: actions/setup-python@v4
+      env:
+        PYTHON_VERSION: '3.10'
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 

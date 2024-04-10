@@ -1,0 +1,57 @@
+name: "Github Workflows syntax"
+
+on:
+  pull_request:
+
+env:
+  NODE_VERSION: 20
+  PYTHON_VERSION: '3.12'
+  
+jobs:
+  pre-commit:
+    name: 'Execute pre-commit rules'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Run pre-commit rules
+        uses: pre-commit/action@v3.0.0
+
+  workflow-validation:
+    name: Github Action Workflows validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: reviewdog/action-actionlint@v1
+
+  tag-release:
+    name: Github release
+    runs-on: ubuntu-latest
+    if: ${{ github.ref_name == 'main' }}
+    needs:
+      - pre-commit
+      - workflow-validation
+    permissions:
+      contents: write
+    outputs:
+      released_version: ${{ steps.release.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: "Semantic release"
+        id: release
+        uses: "meero-com/github-actions-shared-workflows/actions/release/semantic@main"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          npm-token: ${{ secrets.NPM_TOKEN }}
+          branch: 'main'
