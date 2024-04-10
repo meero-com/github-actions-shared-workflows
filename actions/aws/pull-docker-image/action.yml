@@ -46,7 +46,7 @@ runs:
         echo "path=$(echo ${{ inputs.docker_folder }}/${{ inputs.artifact_name }}.tar.gz)" >> $GITHUB_OUTPUT
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v3
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
