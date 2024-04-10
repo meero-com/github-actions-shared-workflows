@@ -16,7 +16,7 @@ jobs:
   advanceTag:
     runs-on: ubuntu-latest
     steps:
-      - uses: "actions/checkout@v3"
+      - uses: "actions/checkout@v4"
 
       - name: "Git Auth Global"
         uses: "meero-com/github-actions-shared-workflows/actions/git/git-auth-global@main"

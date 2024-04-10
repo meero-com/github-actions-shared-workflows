@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout Code"
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v4"
 
       - name: "Build and Push docker container to ECR"
         uses: "meero-com/github-actions-shared-workflows/actions/aws/build-and-push-docker-image@main"

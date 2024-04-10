@@ -14,7 +14,7 @@ jobs:
     name: "Run onejob DB migrations"
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: "meero-com/github-actions-shared-workflows/actions/aws/rds-run-migrations@main"
         with:
