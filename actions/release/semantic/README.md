@@ -20,7 +20,6 @@ jobs:
         uses: "meero-com/github-actions-shared-workflows/actions/release/semantic@main"
         with:
           github-token: ${{ secrets.API_TOKEN_GITHUB }}
-          npm-token: ${{ secrets.NPM_TOKEN }}
 ```
 
 Beware of using a `@ref` (`@main` in the example above) which suits your stability requirements in your workflow:
