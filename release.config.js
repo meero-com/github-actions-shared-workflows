@@ -70,16 +70,6 @@ module.exports = {
         },
       ],
       /**
-       * update package.json version
-       * ref: https://github.com/semantic-release/npm#readme
-       */
-      [
-        "@semantic-release/npm",
-        {
-          npmPublish: false,
-        },
-      ],
-      /**
        * publish a GitHub release and comment on released PR/Issues
        * ref: https://github.com/semantic-release/github#readme
        */
