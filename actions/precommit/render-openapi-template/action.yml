@@ -59,7 +59,7 @@ runs:
       shell: bash
 
     - name: Save ApiGateway file as Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: apigateway-file
         path: apigw/openapi-${{ inputs.OPENAPI_API_NAME }}-${{ inputs.version_identifier }}.json
