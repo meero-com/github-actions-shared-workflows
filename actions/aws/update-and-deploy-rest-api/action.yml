@@ -77,7 +77,7 @@ runs:
         echo "openapi_artifact_filename=$openapi_artifact_filename" >> $GITHUB_OUTPUT
 
     - name: Save Image URI as Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ steps.export_openapi.outputs.openapi_artifact_name }}
         path: ${{ steps.export_openapi.outputs.openapi_artifact_filename }}
