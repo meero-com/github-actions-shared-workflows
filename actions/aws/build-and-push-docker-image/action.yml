@@ -77,7 +77,7 @@ runs:
         echo $IMAGE_URI > ${{ inputs.artifact_name }}.txt
 
     - name: Save Image URI as Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.artifact_name }}
         path: ${{ inputs.artifact_name }}.txt

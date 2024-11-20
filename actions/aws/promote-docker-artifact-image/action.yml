@@ -91,7 +91,7 @@ runs:
       shell: bash
 
     - name: Save Image URI as Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.target_artifact_name }}
         path: ${{ inputs.target_artifact_name }}.txt
