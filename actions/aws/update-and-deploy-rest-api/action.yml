@@ -67,7 +67,8 @@ runs:
     - name: Publish ApiGw doc to stage
       shell: bash
       run: |
-        aws apigateway create-documentation-version --rest-api-id ${{ inputs.APIGW_REST_API_ID }} --documentation-version ${{ inputs.APIGW_VERSION }} --stage-name ${{ inputs.APIGW_STAGE_NAME }} --description 'Api documentation version ${{ inputs.APIGW_VERSION }} from CICD'
+        doc_version="$APIGW-$(date "+%Y%m%d-%H%M%S")"
+        aws apigateway create-documentation-version --rest-api-id ${{ inputs.APIGW_REST_API_ID }} --documentation-version $doc_version --stage-name ${{ inputs.APIGW_STAGE_NAME }} --description 'Api documentation version ${{ inputs.APIGW_VERSION }} from CICD'
 
     - name: Export Openapi
       id: export_openapi
