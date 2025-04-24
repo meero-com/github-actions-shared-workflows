@@ -12,68 +12,9 @@ on:
   workflow_call: ~
 
 jobs:
-  detect-project:
-    runs-on: ubuntu-latest
-    outputs:
-      name: ${{ steps.project-name.outputs.topic }}
-      init: ${{ steps.project-index.outputs.init }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - id: project-name
-        uses: meero-com/github-actions-shared-workflows/.github/actions/get-repo-topic@main
-        with:
-          prefix: 'project-'
-      - id: project-index
-        if: ${{ steps.project-name.outputs.topic != '' }}
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.API_TOKEN_GITHUB }}
-          script: |
-            github.rest.repos.getContent({
-              owner: 'meero-com',
-              repo: 'engineering-documentation',
-              path: 'docs/source/projects/${{ steps.project-name.outputs.topic }}/index.rst'
-            })
-            .then(r => core.setOutput('init', 'ok'))
-            .catch(e => core.setOutput('init', 'not-found'))
-
-
   publish-documentation:
-    needs:
-      - detect-project
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # Init Project directory documentation
-      - uses: meero-com/github-actions-shared-workflows/.github/actions/init-project-dir-documentation@main
-        if: ${{ needs.detect-project.outputs.init == 'not-found' }}
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-        with:
-          project-name: ${{ needs.detect-project.outputs.name }}
-
-      # Sync Repo documentation to project sub-directory
-      - id: project-path
-        uses: actions/github-script@v7
-        with:
-          script: |
-            if ("${{ needs.detect-project.outputs.name }}" != '') {
-              core.setOutput('path', "${{ needs.detect-project.outputs.name }}" + '/includes/')
-            } else {
-              core.setOutput('path', '')
-            }
-      - name: Publish documentation in enginerring
-        id: push_directory
-        uses: cpina/github-action-push-to-another-repository@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-        with:
-          source-directory: 'docs/source'
-          destination-github-username: 'meero-com'
-          destination-repository-name: 'engineering-documentation'
-          commit-message: See ORIGIN_COMMIT from $GITHUB_REF
-          target-branch: master
-          target-directory: docs/source/projects/${{ steps.project-path.outputs.path }}${{ github.event.repository.name }}/
+      - name: Action Disabled
+        run: echo "🚫 This GitHub Action has been disabled and is no longer in use. See meero-com/github-actions-shared-workflows/.github/workflows/publish-documentation.yml@main"
