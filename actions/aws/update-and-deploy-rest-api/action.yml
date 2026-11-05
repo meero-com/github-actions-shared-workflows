@@ -43,14 +43,14 @@ runs:
   using: "composite"
   steps:
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a  # v4.3.1
       with:
         aws-access-key-id: ${{ inputs.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ inputs.AWS_REGION }}
 
     - name: Fetch ApiGateway file artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
       with:
         name: ${{ inputs.ARTIFACT_NAME }}
 
@@ -83,7 +83,7 @@ runs:
         echo "openapi_artifact_filename=$openapi_artifact_filename" >> $GITHUB_OUTPUT
 
     - name: Save Image URI as Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
       with:
         name: ${{ steps.export_openapi.outputs.openapi_artifact_name }}
         path: ${{ steps.export_openapi.outputs.openapi_artifact_filename }}

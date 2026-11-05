@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout Code"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@11d5960a326750d5838078e36cf38b85af677262"  # v4.4.0
 
       - name: BOM compliance
         uses: "meero-com/github-actions-shared-workflows/actions/precommit/bom-compliance@main"
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout Code"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@11d5960a326750d5838078e36cf38b85af677262"  # v4.4.0
 
       - name: BOM compliance
         uses: ./.github/action/bom-compliance
