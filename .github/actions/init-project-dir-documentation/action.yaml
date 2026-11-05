@@ -24,7 +24,7 @@ runs:
       shell: bash
     - name: Publish project index in enginerring
       id: push_project_index
-      uses: cpina/github-action-push-to-another-repository@main
+      uses: cpina/github-action-push-to-another-repository@55306faa4ed53b815ae49e564af8cfb359d32ae2  # v1.7.3
       with:
         source-directory: 'docs_project_temp'
         destination-github-username: 'meero-com'
