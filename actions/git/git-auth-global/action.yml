@@ -17,7 +17,7 @@ runs:
       shell: bash
 
     - name: Global Git auth
-      uses: gacts/run-and-post-run@v1
+      uses: gacts/run-and-post-run@fc6503862aba998e2f2123225ad63c09a92ed46e  # v1.4.5
       env:
         credential_path: ${{ steps.git-credentials.outputs.path }}
       with:

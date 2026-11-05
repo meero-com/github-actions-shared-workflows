@@ -42,10 +42,10 @@ runs:
   using: "composite"
   steps:
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f  # v3.12.0
 
     - name: Configure AWS Credentials - Source account
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a  # v4.3.1
       with:
         aws-access-key-id: ${{ inputs.SOURCE_AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ inputs.SOURCE_AWS_SECRET_ACCESS_KEY }}
@@ -53,7 +53,7 @@ runs:
 
     - name: Login to the Amazon ECR - Source account
       id: login-ecr-source
-      uses: aws-actions/amazon-ecr-login@v2
+      uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd  # v2.1.7
     
     - name: "Store Docker image URI from source account"
       id: docker-uri-source
@@ -67,7 +67,7 @@ runs:
         docker pull ${{ steps.docker-uri-source.outputs.image-uri }}
 
     - name: Configure AWS Credentials - Target account
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a  # v4.3.1
       with:
         aws-access-key-id: ${{ inputs.TARGET_AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ inputs.TARGET_AWS_SECRET_ACCESS_KEY }}
@@ -75,7 +75,7 @@ runs:
 
     - name: Login to the Amazon ECR - Target account
       id: login-ecr-target
-      uses: aws-actions/amazon-ecr-login@v2
+      uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd  # v2.1.7
 
     - name: Tag & Push Docker image to target ECR
       shell: bash
@@ -96,7 +96,7 @@ runs:
       shell: bash
 
     - name: Save Image URI as Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
       with:
         name: ${{ inputs.artifact_name }}
         path: ${{ inputs.artifact_name }}.txt
